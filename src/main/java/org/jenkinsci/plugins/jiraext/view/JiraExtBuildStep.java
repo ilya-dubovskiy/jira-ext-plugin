@@ -23,10 +23,16 @@ import hudson.Extension;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
 import hudson.model.Saveable;
 import hudson.tasks.Builder;
+import hudson.tasks.Publisher;
+import hudson.tasks.BuildStep;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.Notifier;
+import hudson.tasks.BuildStepMonitor;
 import hudson.util.DescribableList;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.jiraext.domain.JiraCommit;
@@ -38,7 +44,7 @@ import java.util.List;
  * @author dalvizu
  */
 public class JiraExtBuildStep
-    extends Builder
+    extends Notifier
 {
 
     public IssueStrategyExtension issueStrategy;
@@ -65,23 +71,32 @@ public class JiraExtBuildStep
         listener.getLogger().println("Finish updating JIRA tickets");
         return true;
     }
-
+	public BuildStepMonitor getRequiredMonitorService() {
+        return BuildStepMonitor.NONE;
+	}
+	
     /**
      * All the configured extensions attached to this {@link JiraExtBuildStep}.
      */
+	 
     public DescribableList<JiraOperationExtension, JiraOperationExtensionDescriptor> getExtensions() {
         return extensions;
     }
-
+	
     @Extension
     public static class DescriptorImpl
-        extends Descriptor<Builder>{
+        extends BuildStepDescriptor<Publisher>{
 
         @Override
         public String getDisplayName()
         {
             return "Update JIRA Issues (jira-ext-plugin)";
         }
+
+        @Override
+        public boolean isApplicable(Class<? extends AbstractProject> jobType) {
+            return true;
+		}
 
         public DescriptorExtensionList<IssueStrategyExtension, Descriptor<IssueStrategyExtension>> getIssueStrategies()
         {
@@ -92,5 +107,6 @@ public class JiraExtBuildStep
         {
             return JiraOperationExtensionDescriptor.all();
         }
+		
     }
 }
