@@ -113,12 +113,22 @@ public final class JiraClientSvcImpl
                             String content)
             throws JiraException
     {
-        logger.fine("Update ticket: " + jiraIssueKey + " field name: " + jiraFieldName + " with content " + content);
 
         JiraClient client = newJiraClient();
         Issue issue = client.getIssue(jiraIssueKey);
         Validate.notNull(issue);
-        issue.update().field(jiraFieldName, content).execute();
+
+        logger.fine("Update ticket: " + jiraIssueKey + " field name: " + jiraFieldName + " with content " + content);
+		
+		String old_value = issue.getField(jiraFieldName).toString();
+		
+		logger.fine("Debug info: old value = " + old_value);
+		
+		// idubovskiy: instead of overwriting the field, we want to append it with something else -- move this to an additional action later (if ever needed)
+		
+		//content += issue.getField(jiraIssueKey).toString();
+	
+        issue.update().field(jiraFieldName, old_value + " " + content).execute();
     }
 
     @Override
