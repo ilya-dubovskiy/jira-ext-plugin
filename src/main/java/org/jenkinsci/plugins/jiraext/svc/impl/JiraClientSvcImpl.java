@@ -119,9 +119,14 @@ public final class JiraClientSvcImpl
         Validate.notNull(issue);
 
         logger.fine("Update ticket: " + jiraIssueKey + " field name: " + jiraFieldName + " with content " + content);
-		
+
+
 		String old_value = issue.getField(jiraFieldName).toString();
-		
+
+        if (old_value=="null"){
+            old_value=" ";
+        }
+
 		logger.fine("Debug info: old value = " + old_value);
 		
 		// idubovskiy: instead of overwriting the field, we want to append it with something else -- move this to an additional action later (if ever needed)
